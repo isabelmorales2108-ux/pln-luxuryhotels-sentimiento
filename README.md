@@ -20,9 +20,9 @@ Las reseñas de huéspedes combinan una calificación numérica con un texto lib
 |:--|:--|:--|:--|
 | 1 | Caracterizar el corpus mediante análisis exploratorio textual | 01 | ✅ |
 | 2 | Normalizar el texto y cuantificar su efecto sobre el vocabulario | 01 | ✅ |
-| 3 | Comparar clasificadores con BoW, TF-IDF y Word2Vec | 02 · 03 | ✅ BoW / TF-IDF · 🔄 Word2Vec |
-| 4 | Evaluar de forma intrínseca el espacio Word2Vec del dominio | 03 | 🔄 |
-| 5 | Definir dimensiones del servicio mediante proyecciones semánticas | 03 | 🔄 |
+| 3 | Comparar clasificadores con BoW, TF-IDF y Word2Vec | 02 · 03 | ✅ BoW / TF-IDF · ✅ Word2Vec |
+| 4 | Evaluar de forma intrínseca el espacio Word2Vec del dominio | 03 | ✅ |
+| 5 | Definir dimensiones del servicio mediante proyecciones semánticas | 03 | ✅ |
 | 6 | Identificar temas mediante modelado de tópicos (NMF, LDA, SVD + KMeans) | 04 | 🔄 |
 
 ---
@@ -79,7 +79,7 @@ Regresión logística con `class_weight="balanced"`, `C` ajustado por validació
 | BoW binario | 0,884 | 0,916 | 0,846 | 0,719 |
 | BoW conteos | 0,886 | 0,891 | 0,792 | 0,769 |
 | **TF-IDF (uni + bigramas)** | **0,918** | **0,927** | **0,862** | **0,824** |
-| Word2Vec (promedio) | 🔄 | | | |
+| Word2Vec (promedio) | 0,806 | 0,945 | **0,931** | 0,482 |
 
 **TF-IDF con bigramas** detecta 112 de las 130 reseñas negativas. Su ventaja proviene de la ponderación IDF y de los bigramas con negación.
 
@@ -93,7 +93,29 @@ La **negación** (*not*) es la señal negativa más fuerte del modelo.
 
 ## 5. Word2Vec y proyecciones semánticas
 
-🔄 *En desarrollo (notebook 03).*
+## 5. Word2Vec y proyecciones semánticas
+
+**Espacio vectorial del dominio** (skip-gram, 100 dimensiones, entrenado solo con las reseñas de entrenamiento): *dirty* → *filthy, mould, stain*; *refund* → *cancellation, agoda, payment*; la analogía *kathmandu − city + lake* devuelve **phewa**, el lago de Pokhara. El primer componente principal separa lo negativo de lo positivo.
+
+![Word2Vec PCA](figures/03_word2vec_pca.png)
+
+**Curva de aprendizaje.** Con pocas reseñas etiquetadas, **Word2Vec supera a TF-IDF** (F1-macro 0,837 frente a 0,646 con 250 reseñas); las curvas se cruzan alrededor de 1.000 y con el conjunto completo gana TF-IDF (0,918 frente a 0,806). Word2Vec aprende la semántica sin etiquetas, pero el promedio de vectores diluye la negación.
+
+![Curva de aprendizaje](figures/03_curva_aprendizaje.png)
+
+**Dimensiones del servicio.** Proyectar la reseña completa produce dimensiones redundantes (correlación 0,79–0,96: todas miden el sentimiento general); proyectar solo el contexto de cada aspecto las separa (0,32–0,59).
+
+![Correlación entre métodos](figures/03_proyecciones_correlacion_metodos.png)
+
+| Dimensión | Mencionada en negativas | d de Cohen | Hallazgo |
+|:--|--:|--:|:--|
+| Personal | 71 % | **2,72** | La que más separa experiencias positivas y negativas |
+| Limpieza | 70 % | 2,03 | La peor valorada en las negativas; sobrerrepresentada |
+| Comida | 57 % | 2,22 | |
+| Precio | 40 % | 0,93 | 3,6 veces más frecuente en negativas; quejas de cobros, no de precio alto |
+| Instalaciones | 43 % | 1,82 | |
+
+![Dimensiones del servicio](figures/03_dimensiones_servicio.png)
 
 ## 6. Modelado de tópicos
 
