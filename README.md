@@ -23,7 +23,7 @@ Las reseñas de huéspedes combinan una calificación numérica con un texto lib
 | 3 | Comparar clasificadores con BoW, TF-IDF y Word2Vec | 02 · 03 | ✅ BoW / TF-IDF · ✅ Word2Vec |
 | 4 | Evaluar de forma intrínseca el espacio Word2Vec del dominio | 03 | ✅ |
 | 5 | Definir dimensiones del servicio mediante proyecciones semánticas | 03 | ✅ |
-| 6 | Identificar temas mediante modelado de tópicos (NMF, LDA, SVD + KMeans) | 04 | 🔄 |
+| 6 | Identificar temas mediante modelado de tópicos (NMF, LDA, SVD + KMeans) | 04 | ✅ |
 
 ---
 
@@ -90,9 +90,6 @@ La **negación** (*not*) es la señal negativa más fuerte del modelo.
 ![Coeficientes TF-IDF](figures/02_coeficientes_tfidf.png)
 
 ---
-
-## 5. Word2Vec y proyecciones semánticas
-
 ## 5. Word2Vec y proyecciones semánticas
 
 **Espacio vectorial del dominio** (skip-gram, 100 dimensiones, entrenado solo con las reseñas de entrenamiento): *dirty* → *filthy, mould, stain*; *refund* → *cancellation, agoda, payment*; la analogía *kathmandu − city + lake* devuelve **phewa**, el lago de Pokhara. El primer componente principal separa lo negativo de lo positivo.
@@ -119,7 +116,24 @@ La **negación** (*not*) es la señal negativa más fuerte del modelo.
 
 ## 6. Modelado de tópicos
 
-🔄 *En desarrollo (notebook 04).*
+Se compararon **NMF + TF-IDF**, **LDA + conteos** y **SVD + KMeans** (línea base) con K = 8 y K = 12, sobre el mismo vocabulario (4.088 términos).
+
+| Método | K | NPMI ↑ | Diversidad@10 ↑ | Estabilidad Jaccard ↑ | NMI externo | Tiempo (s) ↓ |
+|:--|--:|--:|--:|--:|--:|--:|
+| **NMF + TF-IDF** | **8** | **0,160** | **0,888** | **0,955** | 0,066 | 5 |
+| NMF + TF-IDF | 12 | 0,163 | 0,892 | 0,576 | 0,059 | 3 |
+| LDA + conteos | 8 | 0,120 | 0,662 | 0,586 | 0,095 | 209 |
+| LDA + conteos | 12 | 0,134 | 0,600 | 0,432 | 0,113 | 205 |
+| SVD + KMeans | 8 | 0,141 | 0,625 | 0,648 | 0,092 | 3 |
+| SVD + KMeans | 12 | 0,126 | 0,517 | 0,695 | 0,078 | 3 |
+
+**Selección: NMF con K = 8**, el mejor en coherencia, diversidad y estabilidad. Con K = 12 la estabilidad cae a 0,576: los tópicos adicionales dependen de la semilla.
+
+**Sin usar las calificaciones, el modelo aisló el tema de la insatisfacción:** el tópico *Problemas operativos* (*room, night, check, water, work*) ocupa el **54 % de las reseñas negativas y el 14 % de las positivas**. Los tópicos de destino (*Safari en Chitwan*, *Vistas de Pokhara*) y de trato (*Amabilidad del personal*) predominan en las positivas.
+
+![Tópicos por sentimiento](figures/04_topicos_por_sentimiento.png)
+
+**Validación humana.** En la prueba de intrusión de palabras, el evaluador identificó la intrusa en 2 de 8 tópicos (25 %, frente a 16,7 % por azar). Los aciertos ocurrieron en los tópicos de menor NPMI: la coherencia estadística y la interpretabilidad humana no coinciden en este dominio homogéneo.
 
 ## 7. Conclusiones
 
