@@ -10,6 +10,17 @@
 | **Profesor** | Andrés Rosso, Ph.D. |
 | **Fecha** | Noviembre de 2026 |
 
+
+### 📄 Entregables
+
+| Entregable | Enlace |
+|:--|:--|
+| **Informe final** (4 páginas) | [PDF](informe/Informe_Final_PLN_LuxuryHotels_IsabelMorales_EstebanBejarano.pdf) |
+| **Presentación de la sustentación** | [PDF](presentacion/Sustentacion_PLN_LuxuryHotels.pdf)  |
+| **Anteproyecto** | [Word](informe/Anteproyecto_PLN_LuxuryHotels_IsabelMorales_EstebanBejarano.docx) |
+| **Notebooks** | [01 Datos y exploración](notebooks/01_datos_y_exploracion.ipynb) · [02 Clasificación](notebooks/02_representaciones_y_clasificacion.ipynb) · [03 Word2Vec y proyecciones](notebooks/03_word2vec_y_proyecciones.ipynb) · [04 Tópicos](notebooks/04_modelado_de_topicos.ipynb) · [05 Evaluación y errores](notebooks/05_evaluacion_y_errores.ipynb) |
+
+**Resultado principal:** TF-IDF con bigramas clasifica la polaridad con **F1-macro de 0,92**, sin degradarse en el tiempo; el personal, la limpieza y el precio son las dimensiones de la insatisfacción, y NMF descubrió sin etiquetas un tema de quejas que ocupa el **54 % de las reseñas negativas**.
 ---
 
 ## 1. Problema y objetivo
