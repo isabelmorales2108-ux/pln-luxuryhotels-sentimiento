@@ -135,9 +135,47 @@ Se compararon **NMF + TF-IDF**, **LDA + conteos** y **SVD + KMeans** (línea bas
 
 **Validación humana.** En la prueba de intrusión de palabras, el evaluador identificó la intrusa en 2 de 8 tópicos (25 %, frente a 16,7 % por azar). Los aciertos ocurrieron en los tópicos de menor NPMI: la coherencia estadística y la interpretabilidad humana no coinciden en este dominio homogéneo.
 
-## 7. Conclusiones
 
-🔄 *Pendiente.*
+## 7. Evaluación final y análisis de errores
+
+| Validación | F1-macro | *Recall* negativo | Precisión negativa |
+|:--|--:|--:|--:|
+| Aleatoria estratificada (80/20) | 0,918 | 0,862 | 0,824 |
+| **Temporal** (2014–2021 → 2022–2024) | **0,921** | **0,868** | **0,825** |
+
+**La deriva temporal no degrada el modelo**: el vocabulario de la insatisfacción es estable en el tiempo.
+
+**Análisis de errores.** Los errores se concentran en calificaciones intermedias (2 y 4 estrellas) y en reseñas largas (mediana de 90 palabras frente a 58). Los falsos negativos son quejas graves rodeadas de elogios; los **falsos positivos más confiados son reseñas de queja con 4 estrellas** (piscina fuera de servicio, cobros ocultos, sin agua caliente). Ahí el modelo lee el texto mejor de lo que la calificación lo resume.
+
+**Uso del modelo:**
+```python
+from src.prediccion import predict_sentiment
+predict_sentiment("The room was not clean and they charged us extra.")
+# {'clase': 'negativo', 'probabilidad_negativo': 0.993, ...}
+```
+
+## 8. Conclusiones
+
+**Qué se logró**
+1. Un corpus depurado y trazable: la auditoría encontró errores de exportación (`#NAME?`) y un 4 % de reseñas en 23 idiomas, no documentados en el conjunto de datos.
+2. Un clasificador de sentimiento con **F1-macro de 0,92** (TF-IDF + bigramas), robusto a la deriva temporal, frente a 0,49 de la línea base.
+3. Evidencia de que **la representación conveniente depende de cuántos datos etiquetados haya**: Word2Vec gana con menos de ~1.000 reseñas; TF-IDF con más.
+4. Dimensiones del servicio medibles: el **personal** es lo que más separa las experiencias; la **limpieza**, lo peor valorado en las negativas; el **precio**, lo más específico de la insatisfacción (quejas de cobros).
+5. Un tema de insatisfacción (*Problemas operativos*) descubierto **sin etiquetas** por NMF, que ocupa el 54 % de las reseñas negativas.
+
+**Qué no fue posible**
+- Analizar por hotel o ciudad, porque el conjunto de datos no tiene identificador.
+- Aprovechar las 713 reseñas en otros idiomas.
+- Captar el contraste dentro de una reseña («*great food, but rude staff*»): la bolsa de palabras y el promedio de vectores suman señales sin entender cuál pesa más.
+- Una validación humana robusta de los tópicos: un solo evaluador y 8 ítems.
+
+**Aprendizajes**
+- **Conservar las negaciones** fue la decisión de preprocesamiento más importante: *not* es la señal negativa más fuerte del modelo.
+- **La exactitud engaña** con clases desbalanceadas; el F1-macro y el *recall* de la clase minoritaria son las métricas adecuadas.
+- **Una proyección semántica de la reseña completa mide el sentimiento general**, no el aspecto: hay que delimitar el contexto que se proyecta.
+- **La calificación no es una etiqueta perfecta**: los errores del modelo revelan quejas escondidas tras buenas calificaciones.
+
+**Trabajo futuro:** análisis de sentimiento por aspecto, modelos contextuales (*transformers*) y *embeddings* multilingües.
 
 ---
 
@@ -148,7 +186,7 @@ Se compararon **NMF + TF-IDF**, **LDA + conteos** y **SVD + KMeans** (línea bas
 │   ├── raw/            LuxuryHotels.csv (original)
 │   └── processed/      Corpus depurado y normalizado
 ├── notebooks/          01 datos y exploración · 02 clasificación · 03 Word2Vec · 04 tópicos · 05 evaluación
-├── src/                preprocesamiento.py · evaluacion.py · representaciones.py
+├── src/                preprocesamiento.py · evaluacion.py · representaciones.py · proyecciones.py · topicos.py · prediccion.py
 ├── results/            Tablas y métricas (CSV)
 ├── figures/            Gráficos
 ├── references/         Artículos de referencia
@@ -159,7 +197,7 @@ Se compararon **NMF + TF-IDF**, **LDA + conteos** y **SVD + KMeans** (línea bas
 ## Cómo ejecutar
 
 1. Clonar: `git clone https://github.com/isabelmorales2108-ux/pln-luxuryhotels-sentimiento.git`
-2. Entorno Python 3.12 con: `pandas`, `numpy`, `scikit-learn`, `gensim`, `spacy`, `nltk`, `langdetect`, `seaborn`, `wordcloud`; modelo de spaCy: `python -m spacy download en_core_web_sm`
+2. Crear el entorno: `conda env create -f environment.yml` y activarlo con `conda activate nlp312`.
 3. Ejecutar los notebooks en orden (01 → 05). El notebook 01 genera `data/processed/`, que usan los demás.
 
 ## Referencias

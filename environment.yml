@@ -1,0 +1,20 @@
+name: nlp312
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - pandas==3.1.0
+      - numpy==2.5.4
+      - scikit-learn==1.9.1
+      - gensim==4.4.0
+      - spacy==3.8.18
+      - nltk==3.10.4
+      - langdetect
+      - matplotlib==3.11.2
+      - seaborn==0.13.2
+      - wordcloud==1.9.6
+      - joblib
+      - scipy
+      - https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
